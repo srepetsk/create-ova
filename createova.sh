@@ -13,6 +13,7 @@ DATASTOR="/mnt/Glustor"
 # Location of where this script and files reside
 ROOT="/root/create"
 
+# DO NOT EDIT BELOW THIS LINE
 # Help contents
 HELP="./createovf <VM_NAME> <PATH_TO_DATA_DISK>"
 # Template ovf file to use
