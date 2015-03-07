@@ -1,9 +1,15 @@
 #!/bin/bash
-#Prompt for:
+#
+# createova.sh
+#
+# Prompt for:
 #  VM Name
 #  Disk ID (full path)
 #
 # Use the supplied Disk ID to find the "old" disk in the old datastor
+# Modify the supplied template ovf and package it with the disk to create
+#  an ova including both and the disk's .meta file.
+# Designed to allow for passing an OVA into engine-image-upload for use with oVirt.
 
 # Directory to export contents to for tar creation
 # Change this to wherever you want the creation to happen
@@ -13,13 +19,15 @@ DATASTOR="/mnt/Glustor"
 # Location of where this script and files reside
 ROOT="/root/create"
 
+#
 # DO NOT EDIT BELOW THIS LINE
 # Help contents
 HELP="./createovf <VM_NAME> <PATH_TO_DATA_DISK>"
 # Template ovf file to use
 TEMPLATE_OVA="template.ovf"
-# Disk ID to replace:
+# Disk ID to replace
 TEMPLATE_DISK="b094aefc-c3cb-4a52-a0f0-af27f1f63da7"
+# VM name to replace
 TEMPLATE_NAME="srepetsk-test"
 # Where to export the ova
 EXPORT_LOC=""
@@ -67,9 +75,14 @@ fi
 
 echo "Replacing template ovf file with vm information"
 sed -e 's/'${TEMPLATE_NAME}'/'${1}'/g' -e 's/'${TEMPLATE_DISK}'/'${DATA_DISK}'/g' "${ROOT}/${TEMPLATE_OVA}" > ${EXPORT}/${1}.ovf
+# Properly modify the ovf so that oVirt can inport it
 chown vdsm:kvm ${EXPORT}/export.ovf
 chmod u+w ${EXPORT}/export.ovf
 echo ""
 echo "Tarring up VM information:"
+
+# Tar everything up into the final ova
 tar -cvzf ${EXPORT}/${1}.ova -C ${DATA_DIR} ${DATA_DISK} ${DATA_DISK}.meta -C ${EXPORT} ${1}.ovf
 
+echo "----------------------------------------"
+echo "The .OVA has been created at ${EXPORT}/${1}.ova"
